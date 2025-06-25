@@ -2,7 +2,6 @@
 Supabase 클라이언트 설정 및 헬퍼 함수들
 Django와 Supabase를 연동하기 위한 유틸리티
 """
-import os
 from supabase import create_client, Client
 from django.conf import settings
 
@@ -34,10 +33,3 @@ def get_supabase_service_client() -> Client:
         )
     
     return create_client(url, service_key)
-
-# 전역 클라이언트 인스턴스 (선택사항)
-try:
-    supabase: Client = get_supabase_client()
-except (ValueError, AttributeError):
-    # 설정이 없는 경우 None으로 설정
-    supabase = None
