@@ -6,17 +6,22 @@ declare module "next-auth" {
     accessToken?: string;
     refreshToken?: string;
     user: {
-      id: number;
-      username: string;
-      email: string;
-      first_name: string;
-      last_name: string;
+      id?: number | string;
+      username?: string;
+      email?: string;
+      first_name?: string;
+      last_name?: string;
+      name?: string;
+      image?: string;
     } & DefaultSession["user"];
   }
 
   interface User extends DefaultUser {
     accessToken?: string;
     refreshToken?: string;
+    username?: string;
+    first_name?: string;
+    last_name?: string;
   }
 }
 

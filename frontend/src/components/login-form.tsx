@@ -51,6 +51,21 @@ export function LoginForm({
     }
   };
 
+  const handleGithubLogin = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await signIn("github", {
+        callbackUrl: "/",
+      });
+    } catch (error) {
+      setError("GitHub 로그인 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -64,7 +79,13 @@ export function LoginForm({
           <form onSubmit={handleSubmit}>
             <div className="grid gap-6">
               <div className="flex flex-col gap-4">
-                <Button variant="outline" className="w-full" type="button">
+                <Button 
+                  variant="outline" 
+                  className="w-full" 
+                  type="button"
+                  onClick={handleGithubLogin}
+                  disabled={isLoading}
+                >
                   <Github className="mr-2 h-4 w-4" />
                   Login with Github
                 </Button>

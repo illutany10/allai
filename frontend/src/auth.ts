@@ -1,8 +1,11 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import GitHub from "next-auth/providers/github";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  debug: true,
   providers: [
+    GitHub,
     Credentials({
       name: "Credentials",
       credentials: {
@@ -49,12 +52,40 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
         token.user = user;
       }
+      
+      // GitHub 로그인의 경우 Django 백엔드에 토큰 전송
+      if (account?.provider === "github" && account.access_token) {
+        try {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/github/`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                access_token: account.access_token,
+              }),
+            }
+          );
+
+          if (res.ok) {
+            const data = await res.json();
+            token.accessToken = data.access_token;
+            token.refreshToken = data.refresh_token;
+            token.user = data.user;
+          }
+        } catch (error) {
+          console.error("GitHub OAuth backend error:", error);
+        }
+      }
+      
       return token;
     },
     async session({ session, token }) {
