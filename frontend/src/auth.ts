@@ -63,6 +63,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.refreshToken = token.refreshToken as string;
       return session;
     },
+    authorized: ({ auth, request: { nextUrl } }) => {
+      const isLoggedIn = !!auth?.user;
+      const isOnLogin = nextUrl.pathname.startsWith("/login");
+
+      // 로그인 페이지에서는 이미 로그인된 유저를 홈으로 리다이렉트
+      if (isOnLogin && isLoggedIn) {
+        return Response.redirect(new URL("/", nextUrl));
+      }
+
+      // 로그인이 필요한 페이지에서는 로그인 여부 확인
+      return isLoggedIn;
+    },
   },
   pages: {
     signIn: "/login",
